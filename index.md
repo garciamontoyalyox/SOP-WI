@@ -1,3 +1,7 @@
-# SOP and WI
+# Standard Operations Procedure
 
-- [Read the example SOP](ExampleSOP.md)
+- [Example](SOP_Example.md)
+
+# Working Instructions
+
+- [Example](WI_Example.md)
