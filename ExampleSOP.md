@@ -1,41 +1,40 @@
 ---
-layout: page
-title: "Example SOP"
-permalink: /example-sop/
+SOP: Example
+                
 ---
 
-# Example Standard Operating Procedure
+| Section          | Content  |
+|------------------|----------|
+| Scope            | Example  |
+| Description      | Example  |
+| Owner            | Example  |
+| Target Audience  | Example  |
+
+# Example 
 
 ## Purpose
-Describe the objective of this procedure (e.g., how to perform routine maintenance on equipment X).
+Purpose text
 
 ## Scope
-Identify who and what is covered by this SOP (e.g., applies to all operators in Laboratory A who use equipment X).
-
-## Responsibilities
-- **Operators**: Follow the steps outlined in this procedure.
-- **Supervisors**: Ensure operators have been trained and verify that the procedure is followed.
+Scope text
 
 ## Definitions
-Explain any terms or acronyms used in the procedure.
+Definition text 
 
-## Safety
-Outline necessary safety precautions, including required Personal Protective Equipment (PPE) and potential hazards.
+## Responsabilities
+Responsabilities text
 
-## Procedure
+## Setting up a computer
 1. **Preparation**  
-   Gather materials and verify that equipment X is powered off.
+texttexttexttexttext
 2. **Set Up**  
-   Turn on the equipment and ensure the power indicator is illuminated.
+texttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttext
 3. **Calibration**  
-   Calibrate the equipment according to the manufacturer’s instructions.
+texttexttexttexttext
 4. **Operation**  
-   Place the samples in the equipment and start the operation cycle as per instructions.
+texttexttexttexttexttexttexttexttexttext
 5. **Post‑Operation**  
-   Record results in the logbook, clean the work area, and dispose of waste materials properly.
-
-## Records
-Describe where records should be kept and who is responsible for maintaining them.
+texttexttexttexttexttexttexttexttexttext
 
 ## References
-List related documents, manuals, or external references that support this SOP.
+texttexttexttexttext
