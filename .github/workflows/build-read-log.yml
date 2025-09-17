@@ -9,37 +9,43 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+
       - name: Generate Read-and-Understood.md
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.READLOG_TOKEN }} 
           script: |
             const fs = require('fs');
-            const {owner, repo} = context.repo;
-            // Fetch issues labeled 'read'
+            const owner = 'LYO-X';
+            const repo = 'read-receipts';
             const issues = await github.paginate(
               github.rest.issues.listForRepo,
               { owner, repo, labels: 'read', state: 'all', per_page: 100 }
             );
             const rows = issues.map(i => {
               const body = i.body || '';
-              const urlLine = body.split('\n').find(l => l.toLowerCase().includes('document url'));
-              const url = (urlLine && urlLine.split(':').slice(1).join(':').trim()) || '';
+              const lines = body.split('\n').map(s => s.trim());
+              const urlLine = lines.find(l => /^document url/i.test(l));
+              const verLine = lines.find(l => /^version/i.test(l));
+              const url = urlLine ? urlLine.split(':').slice(1).join(':').trim() : '';
+              const ver = verLine ? verLine.split(':').slice(1).join(':').trim() : '';
               const who = i.user?.login ? `@${i.user.login}` : 'unknown';
               const date = (i.created_at || '').slice(0,10);
-              const verLine = body.split('\n').find(l => l.toLowerCase().startsWith('version'));
-              const ver = verLine ? verLine.split(':').slice(1).join(':').trim() : '';
               const titleUrl = (i.title || '').replace(/^Read:\s*/i,'').trim();
               const link = url || titleUrl;
-              return `- ${date} — ${who} read ${link}${ver ? ` (version ${ver})` : ''} [#${i.number}](${i.html_url})`;
+              return `- ${date} — ${who} read ${link}${ver ? ` (version ${ver})` : ''} [#${i.number}](https://github.com/${owner}/${repo}/issues/${i.number})`;
             });
             const md = `# Read-and-Understood\n\n${rows.join('\n')}\n`;
             fs.writeFileSync('Read-and-Understood.md', md);
+
       - name: Commit updates
         run: |
           if [[ -n $(git status --porcelain) ]]; then
-            git config user.name "github-actions[bot]"
+            git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add Read-and-Understood.md
             git commit -m "Update Read-and-Understood.md"
