@@ -40,6 +40,7 @@ texttexttexttexttexttexttexttexttexttext
 texttexttexttexttext
 
 <a class="btn"
-   href="https://github.com/LYO-X/read-logs/issues/new?template=read.yml&labels=read&title=Read:+{{ page.url | absolute_url | uri_escape }}">
+   target="_blank" rel="noopener noreferrer"
+   href="https://github.com/LYO-X/read-logs/issues/new?template=read.yml&title=Read:+{{ page.url | absolute_url | uri_escape }}">
   I have read and acknowledge the above
 </a>
