@@ -21,7 +21,7 @@ jobs:
           script: |
             const fs = require('fs');
             const owner = 'LYO-X';
-            const repo = 'read-receipts';
+            const repo = 'read-logs';
             const issues = await github.paginate(
               github.rest.issues.listForRepo,
               { owner, repo, labels: 'read', state: 'all', per_page: 100 }
