@@ -28,13 +28,13 @@ jobs:
             const owner = 'LYO-X';
             const repo = 'read-logs';
 
-            // Fetch all issues labeled 'read' from the read-logs repo
+            // Fetch all issues labeled 'read'
             const issues = await github.paginate(
               github.rest.issues.listForRepo,
               { owner, repo, labels: 'read', state: 'all', per_page: 100 }
             );
 
-            // Parse Issue Form body: read the line AFTER the "### ..." heading
+            // Helpers to parse Issue Form bodies
             function parseFields(body) {
               const lines = (body || '').split('\n').map(s => s.trim());
               const extractAfterHeading = (heading) => {
@@ -47,20 +47,102 @@ jobs:
               };
             }
 
-            // Build the Markdown rows
-            const rows = issues.map(i => {
-              const { url, ver } = parseFields(i.body);
+            // Collect rows and aggregates
+            const entries = [];
+            const perDoc = new Map();   // url -> {count, users:Set, last}
+            const perUser = new Map();  // user -> {count, docs:Set}
+
+            for (const i of issues) {
+              const { url: urlFromForm, ver } = parseFields(i.body);
               const who = i.user?.login ? `@${i.user.login}` : 'unknown';
               const date = (i.created_at || '').slice(0,10);
-              // Fallback if the form was bypassed: use the URL in the title after "Read:"
+
+              // Fallback: If form field is empty, use URL from the title after "Read:"
               const titleUrl = (i.title || '').replace(/^Read:\s*/i,'').trim();
-              const link = url || titleUrl;
-              return `- ${date} — ${who} read ${link}${ver ? ` (version ${ver})` : ''} [#${i.number}](https://github.com/${owner}/${repo}/issues/${i.number})`;
+              const url = urlFromForm || titleUrl || '(no URL)';
+
+              entries.push({ date, who, url, ver, number: i.number });
+
+              // Aggregate per document
+              const d = perDoc.get(url) || { count: 0, users: new Set(), last: '' };
+              d.count += 1;
+              d.users.add(who);
+              if (!d.last || date > d.last) d.last = date;
+              perDoc.set(url, d);
+
+              // Aggregate per user
+              const u = perUser.get(who) || { count: 0, docs: new Set() };
+              u.count += 1;
+              u.docs.add(url);
+              perUser.set(who, u);
+            }
+
+            // Sort aggregates
+            const docsSorted = Array.from(perDoc.entries()).sort((a,b) => {
+              // by reads desc, then url asc
+              if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+              return a[0].localeCompare(b[0]);
             });
 
-            // Write the output file
-            const header = `# Read-and-Understood\n\nThis page lists read acknowledgements submitted via ${owner}/${repo}.\n`;
-            const md = `${header}\n${rows.join('\n')}\n`;
+            const usersSorted = Array.from(perUser.entries()).sort((a,b) => {
+              // by reads desc, then user asc
+              if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+              return a[0].localeCompare(b[0]);
+            });
+
+            const logSorted = entries.sort((a,b) => {
+              // newest first
+              if (a.date !== b.date) return b.date.localeCompare(a.date);
+              return a.number - b.number;
+            });
+
+            // Build markdown sections
+            const totalReads = entries.length;
+            const uniqueUsers = perUser.size;
+            const uniqueDocs  = perDoc.size;
+
+            const escapePipe = (s) => (s || '').replace(/\|/g, '\\|');
+
+            const docsTable = [
+              '| Document | Reads | Unique users | Last read |',
+              '|---|---:|---:|:---|',
+              ...docsSorted.map(([url, d]) => {
+                const link = url.startsWith('http') ? `[${escapePipe(url)}](${url})` : escapePipe(url);
+                return `| ${link} | ${d.count} | ${d.users.size} | ${d.last} |`;
+              })
+            ].join('\n');
+
+            const usersTable = [
+              '| User | Reads | Unique documents |',
+              '|---|---:|---:|',
+              ...usersSorted.map(([user, u]) => `| ${escapePipe(user)} | ${u.count} | ${u.docs.size} |`)
+            ].join('\n');
+
+            const detailedLog = logSorted.map(e => {
+              const link = e.url.startsWith('http') ? `[${e.url}](${e.url})` : e.url;
+              const ver = e.ver ? ` (version ${e.ver})` : '';
+              return `- ${e.date} — ${e.who} read ${link}${ver} [#${e.number}](https://github.com/${owner}/${repo}/issues/${e.number})`;
+            }).join('\n');
+
+            const md = [
+              '# Read-and-Understood',
+              '',
+              '## Summary',
+              `- Total acknowledgements: **${totalReads}**`,
+              `- Unique users: **${uniqueUsers}**`,
+              `- Unique documents: **${uniqueDocs}**`,
+              '',
+              '### Reads by document',
+              docsTable,
+              '',
+              '### Reads by user',
+              usersTable,
+              '',
+              '## Detailed log',
+              detailedLog,
+              ''
+            ].join('\n');
+
             fs.writeFileSync('Read-and-Understood.md', md);
 
       - name: Commit updates
