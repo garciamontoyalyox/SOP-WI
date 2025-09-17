@@ -59,8 +59,8 @@ The Managing Director has the full access rights and administrative rights to th
 Not applicable.
 
 <a class="btn"
-   href="https://github.com/LYO-X/read-logs/issues/new?template=read.yml&title=Read:+{{ page.url | absolute_url | uri_escape }}&url={{ page.url | absolute_url | uri_escape }}">
-  Mark this page as read
+   href="https://github.com/LYO-X/read-logs/issues/new?template=read.yml&labels=read&title=Read:+{{ page.url | absolute_url | uri_escape }}">
+  I have read and acknowledge the above
 </a>
 
 -----
