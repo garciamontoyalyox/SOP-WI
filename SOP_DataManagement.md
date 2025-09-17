@@ -58,6 +58,11 @@ The Managing Director has the full access rights and administrative rights to th
 # References
 Not applicable.
 
+<a class="btn"
+   href="https://github.com/LYO-X/SOP-WI/issues/new?template=read.yml&title=Read:+SOP_DataManagement&url=https%3A%2F%2Flyo-x.github.io%2FSOP-WI%2FSOP_DataManagement.html">
+  Mark this page as read
+</a>
+
 -----
 
 <sub>Copyright LYO-X AG.  All rights reserved.  May not be reproduced without permission. All hard copies should be checked against the current electronic version within Quality Management System prior to use and destroyed promptly thereafter.  All hard copies are considered Uncontrolled documents.<sub> 
