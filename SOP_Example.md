@@ -38,3 +38,9 @@ texttexttexttexttexttexttexttexttexttext
 
 ## References
 texttexttexttexttext
+
+<a class="btn"
+   target="_blank" rel="noopener noreferrer"
+   href="https://github.com/LYO-X/read-logs/issues/new?template=read.yml&title=Read:+{{ page.url | absolute_url | uri_escape }}">
+  I have read and acknowledge the above
+</a>
