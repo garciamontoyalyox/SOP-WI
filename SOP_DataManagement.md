@@ -59,7 +59,7 @@ The Managing Director has the full access rights and administrative rights to th
 Not applicable.
 
 <a class="btn"
-   href="https://github.com/LYO-X/SOP-WI/issues/new?template=read.yml&title=Read:+SOP_DataManagement&url=https%3A%2F%2Flyo-x.github.io%2FSOP-WI%2FSOP_DataManagement.html">
+   href="https://github.com/LYO-X/SOP-WI/issues/new?template=read.yml&title=Read:+{{ page.url | absolute_url | uri_escape }}&url={{ page.url | absolute_url | uri_escape }}">
   Mark this page as read
 </a>
 
