@@ -48,12 +48,12 @@ stable way. Furthermore, the owner of the computer ensures that this inventory i
 
 ### Stand-alone software
 
-| Software       | Version     | Date        | Person                  | Account                | According SOP                                                     |
-|----------------|-------------|-------------|-------------------------|------------------------|-------------------------------------------------------------------|
-| Monolix Suite  | 2024R1      | 18-Apr-2024 | John Doe                | lyoxadmin              | Yes                                                               |
-| **Validation**                                                                                                                                                    |
-| **Software**   | **Person**  | **Account** | **Date**                | **Status and details**                                                 | **According SOP** |
-| Monolix Suite  | John Doe    | doe         | 18-Apr-2024             | OK.<br>Error might be very long and can make the tables hard to manageasdfasdfasdfasfasdfasdfasdfasdfasdfadsfasdfasdf | Yes               |
+| Software       | Version    | Date        | Person      | Account                                                                | According SOP     |
+| -------------- | ---------- | ----------- | ----------- | ---------------------------------------------------------------------- | ----------------- |
+| Monolix Suite  | 2024R1     | 18-Apr-2024 | John Doe    | lyoxadmin                                                              | Yes               |
+| **Validation** |
+| **Software**   | **Person** | **Account** | **Date**    | **Status and details**                                                 | **According SOP** |
+| Monolix Suite  | John Doe   | doe         | 18-Apr-2024 | OK.<br>Error might be very long and can make the tables hard to manage | Yes               |
 
 
                                                                       
