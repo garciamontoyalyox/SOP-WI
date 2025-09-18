@@ -13,7 +13,7 @@
 - [Table 2: Computer configurations](#table-2-computer-configurations)
 - [Table 3: User accounts](#table-3-user-accounts)
 - [Table 4: User accounts](#table-4-user-remote-desktop)
-- [Table 5: Installation and updated of validated software](#table-5-installation-update-validated-software)
+- [Table 5: Installation and update of validated software](#table-5-installation-update-validated-software)
   - [Stand-alone software](#stand-alone-software)
   - [R-packages](#r-packages)
 - [Table 6: Installation and update of non-validated software](#table-6-installation-update-non-validated-software)
@@ -53,11 +53,10 @@ stable way. Furthermore, the owner of the computer ensures that this inventory i
 | Monolix Suite  | 2024R1      | 18-Apr-2024 | John Doe                | lyoxadmin              | Yes                                                               |
 | **Validation**                                                                                                                                                    |
 | **Software**   | **Person**  | **Account** | **Date**                | **Status and details**                                                 | **According SOP** |
-| Monolix Suite  | John Doe    | doe         | 18-Apr-2024             | OK.<br>Error might be very long and can make the tables hard to manage | Yes               |
-
-                                                                        
+| Monolix Suite  | John Doe    | doe         | 18-Apr-2024             | OK.<br>Error might be very long and can make the tables hard to manageasdfasdfasdfasfasdfasdfasdfasdfasdfadsfasdfasdf | Yes               |
 
 
+                                                                      
 ### R-packages
 
 
