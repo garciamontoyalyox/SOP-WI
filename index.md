@@ -10,3 +10,7 @@
 # Inventory
 
 - [QMS.10 Inventory - Example](QMS.10-Inventory-PowerCrunch-XX.md)
+
+# Read and Understood
+
+- [Read and Understood](Read-and-Understood.md)
