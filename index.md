@@ -6,3 +6,7 @@
 # Working Instructions
 
 - [Example](WI_Example.md)
+
+# Inventory
+
+- [QMS.10 Inventory - Example](QMS.10-Inventory-PowerCrunch-XX.md)
