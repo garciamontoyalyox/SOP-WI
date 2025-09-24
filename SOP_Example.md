@@ -14,6 +14,7 @@
 
 ## Purpose
 Purpose text
+Other stuff
 
 ## Scope
 Scope text
