@@ -13,7 +13,7 @@
 # Example 
 
 ## Purpose
-Purpose text
+Purpose texts
 
 ## Scope
 Scope text
