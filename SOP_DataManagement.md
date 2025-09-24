@@ -32,7 +32,7 @@ For definition of terms, see Quality Manual document, Section “Terms & Definit
 Every collaborator is responsible for implementing the present data management system.
 
 # Tools and Equipment
-Google drive, as part of Google Apps for Work, is used as supporting software to implement the data management system. Instructions for installing google drive can be found in the inventory QMS for supporting software.
+Google drives, as part of Google Apps for Work, is used as supporting software to implement the data management system. Instructions for installing google drive can be found in the inventory QMS for supporting software.
 
 # Procedure
 All documents should be saved on the google drive. This ensures data security and puts into place a back-up, version control and sharing system with permission control for data access. The top-level directory structure is the following:
