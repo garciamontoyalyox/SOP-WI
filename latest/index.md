@@ -1,4 +1,4 @@
-This is the SOP/WI documentation of the release version [[RELEASE]]
+This is the SOP/WI documentation of the release version main branch (latest)
 
 # Standard Operations Procedure
 
