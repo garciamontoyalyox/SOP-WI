@@ -1,6 +1,7 @@
 {
   "default": "latest",
   "versions": [
-    "latest"
+    "latest",
+    "V2025_12"
   ]
 }
