@@ -1,3 +1,7 @@
+<sub>This document is part of LYO-X’s controlled document management system. Release version [[RELEASE]].</sub>
+
+---
+
 # SOP: Data Management 
 > Data management system and top-level directory strucutre             
 ---
