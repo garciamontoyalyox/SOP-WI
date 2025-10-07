@@ -73,15 +73,19 @@ jobs:
           mkdir -p "ghp/${VERSION}"
           rsync -a --delete site/ "ghp/${VERSION}/"
 
-      # Replace the placeholder in the published index.md of this version
-      - name: Replace [[RELEASE]] placeholder with version
+      # Replace [[RELEASE]] in all Markdown files within this version
+      - name: Replace [[RELEASE]] placeholder in all markdown files
         run: |
-          file="ghp/${VERSION}/index.md"
-          if [[ -f "$file" ]]; then
-            label="${VERSION}"
-            [[ "$VERSION" == "latest" ]] && label="main branch (latest)"
+          label="${VERSION}"
+          [[ "$VERSION" == "latest" ]] && label="main branch (latest)"
+          find "ghp/${VERSION}" -type f -name "*.md" -print0 | while IFS= read -r -d '' file; do
             sed -i "s/\[\[RELEASE\]\]/${label}/g" "$file"
-          fi
+          done
+
+      # IMPORTANT: ensure Jekyll stays enabled by removing .nojekyll
+      - name: Remove .nojekyll (allow Jekyll to render index.md)
+        run: |
+          rm -f ghp/.nojekyll
 
       # Keep the dropdown consistent: latest first, then tags (desc)
       - name: Update versions.json
