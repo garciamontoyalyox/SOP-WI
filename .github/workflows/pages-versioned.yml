@@ -27,8 +27,8 @@ jobs:
             echo "VERSION=latest" >> $GITHUB_ENV
           fi
 
-      # If you have a build, do it here and place outputs into ./site
-      # Otherwise we just copy the repo's docs as-is.
+      # If you have a build, do it here and put outputs into ./site
+      # Otherwise we copy the repo content as-is.
       - name: Prepare site files
         run: |
           rm -rf site && mkdir -p site
@@ -46,71 +46,72 @@ jobs:
           fetch-depth: 0
 
       - name: Ensure root landing page & versions.json exist
+        shell: bash
         run: |
           mkdir -p ghp
           # Create a simple root index if it doesn't exist yet
           if [[ ! -f ghp/index.html ]]; then
             cat > ghp/index.html <<'HTML'
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>SOP-WI – Versions</title>
-  <style>
-    body{display:flex;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
-    aside{width:280px;padding:1rem;border-right:1px solid #ddd;min-height:100vh;box-sizing:border-box}
-    main{padding:1rem}
-    select{width:100%;padding:.5rem}
-    .hint{color:#555;font-size:.9rem;margin:.5rem 0 0}
-    .err{color:#b00;font-size:.9rem;margin-top:.5rem}
-    a{color:#0366d6;text-decoration:none}
-  </style>
-</head>
-<body>
-  <aside>
-    <h2>SOP-WI</h2>
-    <label>Choose a version</label>
-    <select id="ver"></select>
-    <p class="hint">Tip: <a id="latestLink" href="#">open latest</a></p>
-    <div id="msg" class="err" style="display:none"></div>
-  </aside>
-  <main>
-    <h1>Versioned documentation</h1>
-    <p>Select a version at left to view that snapshot of the docs.</p>
-  </main>
-  <script>
-    (async function(){
-      // Root of this project pages site, e.g. "/SOP-WI"
-      var root = location.pathname.replace(/\/$/, '');
-      if (!root) root = '/';
-      var sel = document.getElementById('ver');
-      var msg = document.getElementById('msg');
-      document.getElementById('latestLink').href = root + '/latest/';
+            <!doctype html>
+            <html lang="en">
+            <head>
+              <meta charset="utf-8"/>
+              <meta name="viewport" content="width=device-width,initial-scale=1"/>
+              <title>SOP-WI – Versions</title>
+              <style>
+                body{display:flex;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
+                aside{width:280px;padding:1rem;border-right:1px solid #ddd;min-height:100vh;box-sizing:border-box}
+                main{padding:1rem}
+                select{width:100%;padding:.5rem}
+                .hint{color:#555;font-size:.9rem;margin:.5rem 0 0}
+                .err{color:#b00;font-size:.9rem;margin-top:.5rem}
+                a{color:#0366d6;text-decoration:none}
+              </style>
+            </head>
+            <body>
+              <aside>
+                <h2>SOP-WI</h2>
+                <label>Choose a version</label>
+                <select id="ver"></select>
+                <p class="hint">Tip: <a id="latestLink" href="#">open latest</a></p>
+                <div id="msg" class="err" style="display:none"></div>
+              </aside>
+              <main>
+                <h1>Versioned documentation</h1>
+                <p>Select a version at left to view that snapshot of the docs.</p>
+              </main>
+              <script>
+                (async function(){
+                  // Root of this project pages site, e.g. "/SOP-WI"
+                  var root = location.pathname.replace(/\/$/, '');
+                  if (!root) root = '/';
+                  var sel = document.getElementById('ver');
+                  var msg = document.getElementById('msg');
+                  document.getElementById('latestLink').href = root + '/latest/';
 
-      try {
-        var resp = await fetch(root + '/versions.json', {cache:'no-store'});
-        if (!resp.ok) throw new Error('versions.json not found');
-        var data = await resp.json();
-        if (!data.versions || !data.versions.length) throw new Error('No versions listed');
+                  try {
+                    var resp = await fetch(root + '/versions.json', {cache:'no-store'});
+                    if (!resp.ok) throw new Error('versions.json not found');
+                    var data = await resp.json();
+                    if (!data.versions || !data.versions.length) throw new Error('No versions listed');
 
-        data.versions.forEach(function(v){
-          var opt = document.createElement('option');
-          opt.value = v;
-          opt.textContent = (v === 'latest') ? 'latest (main)' : v;
-          sel.appendChild(opt);
-        });
-        sel.value = data.default || 'latest';
-        sel.onchange = function(){ location.href = root + '/' + sel.value + '/'; };
-      } catch (e) {
-        msg.style.display = 'block';
-        msg.textContent = 'No versions found yet. Push to main (latest) or create a tag (e.g., V2025_10).';
-      }
-    }());
-  </script>
-</body>
-</html>
-HTML
+                    data.versions.forEach(function(v){
+                      var opt = document.createElement('option');
+                      opt.value = v;
+                      opt.textContent = (v === 'latest') ? 'latest (main)' : v;
+                      sel.appendChild(opt);
+                    });
+                    sel.value = data.default || 'latest';
+                    sel.onchange = function(){ location.href = root + '/' + sel.value + '/'; };
+                  } catch (e) {
+                    msg.style.display = 'block';
+                    msg.textContent = 'No versions found yet. Push to main (latest) or create a tag (e.g., V2025_10).';
+                  }
+                }());
+              </script>
+            </body>
+            </html>
+            HTML
           fi
 
           # Create versions.json if missing
@@ -118,7 +119,7 @@ HTML
             echo '{"default":"latest","versions":["latest"]}' > ghp/versions.json
           fi
 
-      - name: Install jq (ensure available)
+      - name: Ensure jq is available
         run: |
           if ! command -v jq >/dev/null 2>&1; then
             sudo apt-get update
@@ -130,10 +131,10 @@ HTML
           mkdir -p "ghp/${VERSION}"
           rsync -a --delete site/ "ghp/${VERSION}/"
 
-      - name: Update versions.json (keep latest first, then tags desc)
+      - name: Update versions.json (latest first, then tags desc)
         run: |
           cd ghp
-          # Add current version to list, ensure uniqueness
+          # Add current version, ensure uniqueness, order: latest first then tags desc
           jq --arg v "$VERSION" '
             .versions as $vs
             | ($vs + [$v]) | unique
