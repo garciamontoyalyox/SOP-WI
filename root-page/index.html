@@ -12,6 +12,7 @@
     .hint{color:#555;font-size:.9rem;margin:.5rem 0 0}
     .err{color:#b00;font-size:.9rem;margin-top:.5rem}
     a{color:#0366d6;text-decoration:none}
+    code{background:#f6f8fa;padding:0 .25rem;border-radius:3px}
   </style>
 </head>
 <body>
@@ -28,20 +29,32 @@
   </main>
   <script>
     (async function(){
-      // Works on project pages like /SOP-WI
-      var root = location.pathname.replace(/\/$/, '');
-      if (!root) root = '/';
+      // Compute project base (e.g., "/SOP-WI")
+      var parts = location.pathname.split('/').filter(Boolean); // ["SOP-WI", ...]
+      var projectBase = parts.length ? '/' + parts[0] : '/';
       var sel = document.getElementById('ver');
       var msg = document.getElementById('msg');
-      document.getElementById('latestLink').href = root + '/latest/';
+
+      document.getElementById('latestLink').href = projectBase + '/latest/';
+
+      async function loadVersionsJson() {
+        // First try projectBase/versions.json (project pages)
+        var u1 = projectBase + '/versions.json';
+        try {
+          var r1 = await fetch(u1, {cache:'no-store'});
+          if (r1.ok) return r1.json();
+        } catch(e){}
+        // Fallback to /versions.json (user/org pages)
+        try {
+          var r2 = await fetch('/versions.json', {cache:'no-store'});
+          if (r2.ok) return r2.json();
+        } catch(e){}
+        throw new Error('versions.json not found at ' + u1 + ' or /versions.json');
+      }
 
       try {
-        var resp = await fetch(root + '/versions.json', {cache:'no-store'});
-        if (!resp.ok) throw new Error('versions.json not found');
-        var data = await resp.json();
+        var data = await loadVersionsJson();
         if (!data.versions || !data.versions.length) throw new Error('No versions listed');
-
-        // Put 'latest' first, then your tags (e.g., V2025_10)
         data.versions.forEach(function(v){
           var opt = document.createElement('option');
           opt.value = v;
@@ -49,10 +62,13 @@
           sel.appendChild(opt);
         });
         sel.value = data.default || 'latest';
-        sel.onchange = function(){ location.href = root + '/' + sel.value + '/'; };
+        sel.onchange = function(){ location.href = projectBase + '/' + sel.value + '/'; };
       } catch (e) {
         msg.style.display = 'block';
-        msg.textContent = 'No versions found yet. Push to main (latest) or create a tag (e.g., V2025_10).';
+        msg.innerHTML =
+          'Could not load <code>versions.json</code>. ' +
+          'Open <code>' + (parts.length ? projectBase : '') + '/versions.json</code> in the browser. ' +
+          'If it 404s, your workflow hasn’t written it yet.';
       }
     }());
   </script>
