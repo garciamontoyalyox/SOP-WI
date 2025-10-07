@@ -1,0 +1,2 @@
+url: "https://lyo-x.github.io"
+baseurl: "/SOP-WI"
