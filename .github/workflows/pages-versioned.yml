@@ -74,6 +74,15 @@ jobs:
           mkdir -p "ghp/${VERSION}"
           rsync -a --delete site/ "ghp/${VERSION}/"
 
+     - name: Replace [[RELEASE]] placeholder with version
+  run: |
+    file="ghp/${VERSION}/index.md"
+    if [[ -f "$file" ]]; then
+      label="${VERSION}"
+      [[ "$VERSION" == "latest" ]] && label="main branch (latest)"
+      sed -i "s/\[\[RELEASE\]\]/${label}/g" "$file"
+    fi     
+
       - name: Update versions.json (latest first, then tags desc)
         run: |
           cd ghp
