@@ -1,4 +1,4 @@
-does this trigger something?
+This is the SOP/WI documentation of the release version [[RELEASE]]
 
 # Standard Operations Procedure
 
