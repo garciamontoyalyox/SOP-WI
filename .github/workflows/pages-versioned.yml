@@ -52,13 +52,16 @@ jobs:
             sudo apt-get install -y jq
           fi
 
-      - name: Ensure root landing page (only if missing)
+      - name: Ensure root landing page & .nojekyll
         run: |
           mkdir -p ghp
-          if [[ ! -f ghp/index.html && -f root-page/index.html ]]; then
+          # Always refresh the homepage from the repo
+          if [[ -f root-page/index.html ]]; then
             cp root-page/index.html ghp/index.html
           fi
-
+          # Avoid Jekyll quirks
+          touch ghp/.nojekyll
+          
       - name: Ensure versions.json exists
         run: |
           mkdir -p ghp
