@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]         # updates /latest
     tags:
-      - 'v*'                   # e.g., v1.0, v2.1 -> updates /v1.0, /v2.1
+      - 'V*'                   # e.g., V2025_10
 
 permissions:
   contents: write
