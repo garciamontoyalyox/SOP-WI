@@ -1,10 +1,10 @@
-name: Publish version releases
+name: Publish versioned docs to Pages
 
 on:
   push:
-    branches: [ main ]         # updates /latest
+    branches: [ main ]          # Publishes to /latest
     tags:
-      - 'V*'                   # e.g., V2025_10
+      - 'V*'                    # Publishes to /VYYYY_MM (e.g., V2025_10)
 
 permissions:
   contents: write
@@ -12,14 +12,14 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout source (this repo)
+      - name: Checkout source (main/tag)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Decide which version folder to publish to
-      - name: Set version env
+      - name: Set VERSION env (latest or tag name)
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
@@ -27,103 +27,129 @@ jobs:
             echo "VERSION=latest" >> $GITHUB_ENV
           fi
 
-      # Your "build" step (if you have one). If not, just copy files.
+      # If you have a build, do it here and place outputs into ./site
+      # Otherwise we just copy the repo's docs as-is.
       - name: Prepare site files
         run: |
           rm -rf site && mkdir -p site
-          # Copy the markdown and assets you want to publish
           rsync -a --delete \
-            --exclude '.git' --exclude '.github' \
-            --exclude 'README.md' \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'node_modules' \
             ./ site/
 
-      # Pull the current versions_branch branch so we can keep older versions
-      - name: Checkout versions_branch
+      - name: Checkout versions branch (versions_branch)
         uses: actions/checkout@v4
         with:
           ref: versions_branch
           path: ghp
           fetch-depth: 0
 
-      - name: Ensure versions_branch tree exists
+      - name: Ensure root landing page & versions.json exist
         run: |
           mkdir -p ghp
-          # Create root landing page assets if first time
-          [[ -f ghp/index.html ]] || cat > ghp/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8"/>
-            <meta name="viewport" content="width=device-width,initial-scale=1"/>
-            <title>SOP-WI – Versions</title>
-            <style>
-              body{display:flex;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
-              aside{width:280px;padding:1rem;border-right:1px solid #ddd;min-height:100vh;box-sizing:border-box}
-              main{padding:1rem}
-              select{width:100%;padding:.5rem}
-              .hint{color:#555;font-size:.9rem;margin:.5rem 0 0}
-              a{color:#0366d6;text-decoration:none}
-            </style>
-          </head>
-          <body>
-            <aside>
-              <h2>SOP-WI</h2>
-              <label>Choose a version</label>
-              <select id="ver"></select>
-              <p class="hint">Tip: <a id="latestLink" href="#">open latest</a></p>
-            </aside>
-            <main>
-              <h1>Versioned documentation</h1>
-              <p>Select a version at left to view that snapshot of the docs.</p>
-            </main>
-            <script>
-              (async function(){
-                const base = location.pathname.replace(/\\/$/, '');
-                // e.g., "/SOP-WI" for project pages
-                const basePath = base.split('/').slice(0,3).join('/');
-                const resp = await fetch(basePath + '/versions.json', {cache:'no-store'});
-                const data = await resp.json();
-                const sel = document.getElementById('ver');
-                data.versions.forEach(v => {
-                  const opt = document.createElement('option');
-                  opt.value = v;
-                  opt.textContent = v === 'latest' ? 'latest (main)' : v;
-                  sel.appendChild(opt);
-                });
-                sel.value = data.default || 'latest';
-                sel.onchange = () => location.href = basePath + '/' + sel.value + '/';
-                document.getElementById('latestLink').href = basePath + '/latest/';
-              }());
-            </script>
-          </body>
-          </html>
-          HTML
+          # Create a simple root index if it doesn't exist yet
+          if [[ ! -f ghp/index.html ]]; then
+            cat > ghp/index.html <<'HTML'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SOP-WI – Versions</title>
+  <style>
+    body{display:flex;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
+    aside{width:280px;padding:1rem;border-right:1px solid #ddd;min-height:100vh;box-sizing:border-box}
+    main{padding:1rem}
+    select{width:100%;padding:.5rem}
+    .hint{color:#555;font-size:.9rem;margin:.5rem 0 0}
+    .err{color:#b00;font-size:.9rem;margin-top:.5rem}
+    a{color:#0366d6;text-decoration:none}
+  </style>
+</head>
+<body>
+  <aside>
+    <h2>SOP-WI</h2>
+    <label>Choose a version</label>
+    <select id="ver"></select>
+    <p class="hint">Tip: <a id="latestLink" href="#">open latest</a></p>
+    <div id="msg" class="err" style="display:none"></div>
+  </aside>
+  <main>
+    <h1>Versioned documentation</h1>
+    <p>Select a version at left to view that snapshot of the docs.</p>
+  </main>
+  <script>
+    (async function(){
+      // Root of this project pages site, e.g. "/SOP-WI"
+      var root = location.pathname.replace(/\/$/, '');
+      if (!root) root = '/';
+      var sel = document.getElementById('ver');
+      var msg = document.getElementById('msg');
+      document.getElementById('latestLink').href = root + '/latest/';
+
+      try {
+        var resp = await fetch(root + '/versions.json', {cache:'no-store'});
+        if (!resp.ok) throw new Error('versions.json not found');
+        var data = await resp.json();
+        if (!data.versions || !data.versions.length) throw new Error('No versions listed');
+
+        data.versions.forEach(function(v){
+          var opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = (v === 'latest') ? 'latest (main)' : v;
+          sel.appendChild(opt);
+        });
+        sel.value = data.default || 'latest';
+        sel.onchange = function(){ location.href = root + '/' + sel.value + '/'; };
+      } catch (e) {
+        msg.style.display = 'block';
+        msg.textContent = 'No versions found yet. Push to main (latest) or create a tag (e.g., V2025_10).';
+      }
+    }());
+  </script>
+</body>
+</html>
+HTML
+          fi
 
           # Create versions.json if missing
-          [[ -f ghp/versions.json ]] || echo '{"default":"latest","versions":["latest"]}' > ghp/versions.json
+          if [[ ! -f ghp/versions.json ]]; then
+            echo '{"default":"latest","versions":["latest"]}' > ghp/versions.json
+          fi
 
-      # Copy the built site into the version folder (e.g., /v2.0/ or /latest/)
+      - name: Install jq (ensure available)
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+
       - name: Copy site into version folder
         run: |
           mkdir -p "ghp/${VERSION}"
           rsync -a --delete site/ "ghp/${VERSION}/"
 
-      # Update versions.json list (keeps unique, sorted-like order with latest first)
-      - name: Update versions.json
+      - name: Update versions.json (keep latest first, then tags desc)
         run: |
           cd ghp
+          # Add current version to list, ensure uniqueness
           jq --arg v "$VERSION" '
             .versions as $vs
             | ($vs + [$v]) | unique
-            | {default: "latest", versions: .}
-          ' versions.json > versions.new.json || echo '{"default":"latest","versions":["latest","'"$VERSION"'"]}' > versions.new.json
+            | . as $all
+            | { default: "latest",
+                versions: ( ["latest"] + ($all - ["latest"]) | sort | reverse )
+              }
+          ' versions.json > versions.new.json \
+          || echo '{"default":"latest","versions":["latest","'"$VERSION"'"]}' > versions.new.json
           mv versions.new.json versions.json
 
       - name: Commit and push to versions_branch
         run: |
           cd ghp
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Publish ${VERSION} [skip ci]" || echo "No changes"
-          git push origin versions_branch
+          git commit -m "Publish ${VERSION} [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:versions_branch
