@@ -1,9 +1,8 @@
-name: Publish versioned docs to Pages
+name: Publish version releases
 
 on:
   push:
     branches: [ main ]         # updates /latest
-  push:
     tags:
       - 'v*'                   # e.g., v1.0, v2.1 -> updates /v1.0, /v2.1
 
