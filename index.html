@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SOP-WI – Versions</title>
+  <style>
+    body{display:flex;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
+    aside{width:280px;padding:1rem;border-right:1px solid #ddd;min-height:100vh;box-sizing:border-box}
+    main{padding:1rem}
+    select{width:100%;padding:.5rem}
+    .hint{color:#555;font-size:.9rem;margin:.5rem 0 0}
+    a{color:#0366d6;text-decoration:none}
+  </style>
+</head>
+<body>
+  <aside>
+    <h2>SOP-WI</h2>
+    <label>Choose a version</label>
+    <select id="ver"></select>
+    <p class="hint">Tip: <a id="latestLink" href="#">open latest</a></p>
+  </aside>
+  <main>
+    <h1>Versioned documentation</h1>
+    <p>Select a version at left to view that snapshot of the docs.</p>
+  </main>
+  <script>
+    (async function(){
+      const base = location.pathname.replace(/\\/$/, '');
+      // e.g., "/SOP-WI" for project pages
+      const basePath = base.split('/').slice(0,3).join('/');
+      const resp = await fetch(basePath + '/versions.json', {cache:'no-store'});
+      const data = await resp.json();
+      const sel = document.getElementById('ver');
+      data.versions.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v === 'latest' ? 'latest (main)' : v;
+        sel.appendChild(opt);
+      });
+      sel.value = data.default || 'latest';
+      sel.onchange = () => location.href = basePath + '/' + sel.value + '/';
+      document.getElementById('latestLink').href = basePath + '/latest/';
+    }());
+  </script>
+</body>
+</html>
